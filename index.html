@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Homepage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            color: #2c3e50;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 2rem 0;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: 400;
+        }
+
+        .links-section {
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.3rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .link-item:hover::before {
+            left: 100%;
+        }
+
+        .link-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .link-icon {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .link-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .time-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .time-display {
+            font-size: 5rem;
+            font-weight: 200;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .date-display {
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .day-display {
+            font-size: 1.1rem;
+            color: #95a5a6;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .search-section {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 3rem;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            font-size: 1.1rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: #2c3e50;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input::placeholder {
+            color: #95a5a6;
+        }
+
+        .search-input:focus {
+            border-color: #3498db;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 8px 30px rgba(52, 152, 219, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .quick-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-title {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            font-weight: 300;
+        }
+
+        .weather-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 2rem 1rem;
+            }
+            
+            .time-display {
+                font-size: 3.5rem;
+            }
+            
+            .date-display {
+                font-size: 1.2rem;
+            }
+            
+            .quick-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Quick Access</div>
+            <div class="sidebar-subtitle">Your favorite links</div>
+        </div>
+        
+        <div class="links-section">
+            <div class="section-title">Productivity</div>
+            <a href="https://gmail.com" class="link-item">
+                <div class="link-icon">📧</div>
+                <div class="link-name">Gmail</div>
+            </a>
+            <a href="https://drive.google.com" class="link-item">
+                <div class="link-icon">📁</div>
+                <div class="link-name">Drive</div>
+            </a>
+            <a href="https://docs.google.com" class="link-item">
+                <div class="link-icon">📝</div>
+                <div class="link-name">Docs</div>
+            </a>
+            <a href="https://sheets.google.com" class="link-item">
+                <div class="link-icon">📊</div>
+                <div class="link-name">Sheets</div>
+            </a>
+            <a href="https://github.com" class="link-item">
+                <div class="link-icon">💻</div>
+                <div class="link-name">GitHub</div>
+            </a>
+            
+            <div class="section-title" style="margin-top: 2rem;">News & Social</div>
+            <a href="https://bbc.co.uk/news" class="link-item">
+                <div class="link-icon">📰</div>
+                <div class="link-name">BBC News</div>
+            </a>
+            <a href="https://instagram.com" class="link-item">
+                <div class="link-icon">📷</div>
+                <div class="link-name">Instagram</div>
+            </a>
+            <a href="https://androidpolice.com" class="link-item">
+                <div class="link-icon">🤖</div>
+                <div class="link-name">Android Police</div>
+            </a>
+            <a href="https://metoffice.gov.uk" class="link-item">
+                <div class="link-icon">🌤️</div>
+                <div class="link-name">Met Office</div>
+            </a>
+            
+            <div class="section-title" style="margin-top: 2rem;">Entertainment</div>
+            <a href="https://youtube.com" class="link-item">
+                <div class="link-icon">📺</div>
+                <div class="link-name">YouTube</div>
+            </a>
+            <a href="https://www.whattowatch.com/uk-tv-guide?platform=4f44db8b-c50b-5505-8f26-96d6893d5f68&region=Wales" class="link-item">
+                <div class="link-icon">📻</div>
+                <div class="link-name">TV Guide</div>
+            </a>
+            <a href="https://flightradar24.com" class="link-item">
+                <div class="link-icon">✈️</div>
+                <div class="link-name">FlightRadar24</div>
+            </a>
+            <a href="http://192.168.68.55:8754/" class="link-item">
+                <div class="link-icon">📡</div>
+                <div class="link-name">FR24 Stats</div>
+            </a>
+            <a href="https://www.formula1.com" class="link-item">
+                <div class="link-icon">🏎️</div>
+                <div class="link-name">Formula One</div>
+            </a>
+            
+            <div class="section-title" style="margin-top: 2rem;">Shopping</div>
+            <a href="https://amazon.co.uk" class="link-item">
+                <div class="link-icon">📦</div>
+                <div class="link-name">Amazon</div>
+            </a>
+            <a href="https://ocado.com" class="link-item">
+                <div class="link-icon">🛒</div>
+                <div class="link-name">Ocado</div>
+            </a>
+            <a href="https://johnlewis.com" class="link-item">
+                <div class="link-icon">🏪</div>
+                <div class="link-name">John Lewis</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="time-section">
+            <div class="time-display" id="timeDisplay">12:00</div>
+            <div class="date-display" id="dateDisplay">Saturday, 5th July 2025</div>
+            <div class="day-display" id="dayDisplay">Saturday</div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search the web..." id="searchInput">
+            </div>
+        </div>
+
+        <div class="quick-info">
+            <div class="info-card">
+                <div class="weather-icon">☀️</div>
+                <div class="info-title">Weather</div>
+                <div class="info-value">22°C</div>
+                <div style="color: #7f8c8d; font-size: 0.9rem; margin-top: 0.5rem;">Manchester</div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">Local Time</div>
+                <div class="info-value" id="localTime">12:00</div>
+                <div style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 1rem;">GMT</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(0, 0, 0, 0.1);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.2rem;">🌅</div>
+                        <div style="font-size: 0.9rem; color: #2c3e50; font-weight: 500;" id="sunriseTime">05:42</div>
+                        <div style="font-size: 0.7rem; color: #7f8c8d;">Sunrise</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.2rem;">🌇</div>
+                        <div style="font-size: 0.9rem; color: #2c3e50; font-weight: 500;" id="sunsetTime">21:18</div>
+                        <div style="font-size: 0.7rem; color: #7f8c8d;">Sunset</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">Week</div>
+                <div class="info-value" id="weekNumber">27</div>
+                <div style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 1rem;">of 2025</div>
+                <div style="text-align: center; padding-top: 1rem; border-top: 1px solid rgba(0, 0, 0, 0.1);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;" id="moonPhaseIcon">🌓</div>
+                    <div style="font-size: 0.8rem; color: #2c3e50; font-weight: 500;" id="moonPhaseName">First Quarter</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateMoonPhase() {
+            const now = new Date();
+            
+            // Moon phase calculation using a known new moon date as reference
+            // January 1, 2000 was approximately a new moon
+            const knownNewMoon = new Date(2000, 0, 6, 18, 14); // Jan 6, 2000
+            const moonCycle = 29.53058867; // days in a lunar cycle
+            
+            const daysDifference = (now - knownNewMoon) / (1000 * 60 * 60 * 24);
+            const moonAge = daysDifference % moonCycle;
+            
+            let moonIcon, moonName;
+            
+            if (moonAge < 1.84566) {
+                moonIcon = '🌑';
+                moonName = 'New Moon';
+            } else if (moonAge < 5.53699) {
+                moonIcon = '🌒';
+                moonName = 'Waxing Crescent';
+            } else if (moonAge < 9.22831) {
+                moonIcon = '🌓';
+                moonName = 'First Quarter';
+            } else if (moonAge < 12.91963) {
+                moonIcon = '🌔';
+                moonName = 'Waxing Gibbous';
+            } else if (moonAge < 16.61096) {
+                moonIcon = '🌕';
+                moonName = 'Full Moon';
+            } else if (moonAge < 20.30228) {
+                moonIcon = '🌖';
+                moonName = 'Waning Gibbous';
+            } else if (moonAge < 23.99361) {
+                moonIcon = '🌗';
+                moonName = 'Last Quarter';
+            } else {
+                moonIcon = '🌘';
+                moonName = 'Waning Crescent';
+            }
+            
+            document.getElementById('moonPhaseIcon').textContent = moonIcon;
+            document.getElementById('moonPhaseName').textContent = moonName;
+        }
+
+        function calculateSunTimes() {
+            // Coordinates for Manchester, UK
+            const lat = 53.4808;
+            const lon = -2.2426;
+            
+            const now = new Date();
+            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+            
+            // Check if we're in British Summer Time (last Sunday in March to last Sunday in October)
+            const year = now.getFullYear();
+            const marchLastSunday = new Date(year, 2, 31 - (new Date(year, 2, 31).getDay()));
+            const octoberLastSunday = new Date(year, 9, 31 - (new Date(year, 9, 31).getDay()));
+            const isDST = now >= marchLastSunday && now < octoberLastSunday;
+            const timezoneOffset = isDST ? 1 : 0; // BST is UTC+1, GMT is UTC+0
+            
+            // Simplified sunrise/sunset calculation
+            const P = Math.asin(0.39795 * Math.cos(0.98563 * (dayOfYear - 173) * Math.PI / 180));
+            const argument = -Math.tan(lat * Math.PI / 180) * Math.tan(P);
+            
+            if (argument < -1 || argument > 1) {
+                // Polar day or night
+                document.getElementById('sunriseTime').textContent = '--:--';
+                document.getElementById('sunsetTime').textContent = '--:--';
+                return;
+            }
+            
+            const hourAngle = Math.acos(argument) * 180 / Math.PI;
+            let sunrise = 12 - hourAngle / 15 - lon / 15 + timezoneOffset;
+            let sunset = 12 + hourAngle / 15 - lon / 15 + timezoneOffset;
+            
+            // Convert to local time and format
+            const formatTime = (hours) => {
+                // Handle day overflow
+                if (hours >= 24) hours -= 24;
+                if (hours < 0) hours += 24;
+                
+                const h = Math.floor(hours);
+                const m = Math.floor((hours - h) * 60);
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            };
+            
+            document.getElementById('sunriseTime').textContent = formatTime(sunrise);
+            document.getElementById('sunsetTime').textContent = formatTime(sunset);
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Update main time display
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false
+            };
+            document.getElementById('timeDisplay').textContent = now.toLocaleTimeString('en-GB', timeOptions);
+            
+            // Update date display
+            const dateOptions = { 
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            };
+            const dateStr = now.toLocaleDateString('en-GB', dateOptions);
+            const day = now.getDate();
+            const suffix = day % 10 === 1 && day !== 11 ? 'st' : 
+                          day % 10 === 2 && day !== 12 ? 'nd' : 
+                          day % 10 === 3 && day !== 13 ? 'rd' : 'th';
+            document.getElementById('dateDisplay').textContent = dateStr.replace(/\d+/, day + suffix);
+            
+            // Update day display
+            document.getElementById('dayDisplay').textContent = now.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
+            
+            // Update local time in info card
+            const localTimeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false
+            };
+            document.getElementById('localTime').textContent = now.toLocaleTimeString('en-GB', localTimeOptions);
+            
+            // Update week number
+            const start = new Date(now.getFullYear(), 0, 1);
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const dayOfYear = Math.floor((today - start) / (24 * 60 * 60 * 1000));
+            const weekNum = Math.ceil(dayOfYear / 7);
+            document.getElementById('weekNumber').textContent = weekNum;
+        }
+
+        // Handle search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query) {
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                    this.value = '';
+                }
+            }
+        });
+
+        // Initialize and update every second
+        updateDateTime();
+        calculateSunTimes();
+        calculateMoonPhase();
+        setInterval(updateDateTime, 1000);
+        
+        // Update sun times and moon phase once per day at midnight
+        setInterval(() => {
+            calculateSunTimes();
+            calculateMoonPhase();
+        }, 24 * 60 * 60 * 1000);
+    </script>
+</body>
+</html>
