@@ -358,10 +358,11 @@
 
         <div class="quick-info">
             <div class="info-card">
-                <div class="weather-icon">☀️</div>
+                <div class="weather-icon" id="weatherIcon">☀️</div>
                 <div class="info-title">Weather</div>
-                <div class="info-value">22°C</div>
-                <div style="color: #7f8c8d; font-size: 0.9rem; margin-top: 0.5rem;">Manchester</div>
+                <div class="info-value" id="weatherTemp">--°C</div>
+                <div style="color: #7f8c8d; font-size: 0.9rem; margin-top: 0.5rem;" id="weatherLocation">Loading...</div>
+                <div style="color: #7f8c8d; font-size: 0.8rem; margin-top: 0.2rem;" id="weatherCondition">--</div>
             </div>
             
             <div class="info-card">
@@ -395,6 +396,159 @@
     </div>
 
     <script>
+        // Weather functionality using Open-Meteo (no API key required)
+        function getWeatherIcon(weatherCode, isDay = true) {
+            // WMO Weather interpretation codes
+            const iconMap = {
+                0: isDay ? '☀️' : '🌙', // Clear sky
+                1: isDay ? '🌤️' : '🌙', // Mainly clear
+                2: isDay ? '⛅' : '☁️', // Partly cloudy
+                3: '☁️', // Overcast
+                45: '🌫️', 48: '🌫️', // Fog
+                51: '🌦️', 53: '🌦️', 55: '🌦️', // Drizzle
+                56: '🌨️', 57: '🌨️', // Freezing drizzle
+                61: '🌧️', 63: '🌧️', 65: '🌧️', // Rain
+                66: '🌨️', 67: '🌨️', // Freezing rain
+                71: '🌨️', 73: '❄️', 75: '❄️', 77: '❄️', // Snow
+                80: '🌦️', 81: '🌧️', 82: '🌧️', // Rain showers
+                85: '🌨️', 86: '❄️', // Snow showers
+                95: '⛈️', 96: '⛈️', 99: '⛈️' // Thunderstorm
+            };
+            return iconMap[weatherCode] || (isDay ? '☀️' : '🌙');
+        }
+        
+        function getWeatherDescription(weatherCode) {
+            const descriptions = {
+                0: 'Clear sky',
+                1: 'Mainly clear',
+                2: 'Partly cloudy',
+                3: 'Overcast',
+                45: 'Fog',
+                48: 'Depositing rime fog',
+                51: 'Light drizzle',
+                53: 'Moderate drizzle',
+                55: 'Dense drizzle',
+                56: 'Light freezing drizzle',
+                57: 'Dense freezing drizzle',
+                61: 'Slight rain',
+                63: 'Moderate rain',
+                65: 'Heavy rain',
+                66: 'Light freezing rain',
+                67: 'Heavy freezing rain',
+                71: 'Slight snow fall',
+                73: 'Moderate snow fall',
+                75: 'Heavy snow fall',
+                77: 'Snow grains',
+                80: 'Slight rain showers',
+                81: 'Moderate rain showers',
+                82: 'Violent rain showers',
+                85: 'Slight snow showers',
+                86: 'Heavy snow showers',
+                95: 'Thunderstorm',
+                96: 'Thunderstorm with slight hail',
+                99: 'Thunderstorm with heavy hail'
+            };
+            return descriptions[weatherCode] || 'Unknown';
+        }
+        
+        async function updateWeather() {
+            try {
+                // Get user's location
+                if (!navigator.geolocation) {
+                    console.log('Geolocation not supported, using Manchester fallback');
+                    await fetchWeatherForManchester();
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    console.log(`Got location: ${latitude}, ${longitude}`);
+                    
+                    try {
+                        // Fetch weather data from Open-Meteo
+                        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,is_day&timezone=auto`;
+                        console.log('Fetching weather from:', weatherUrl);
+                        
+                        const response = await fetch(weatherUrl);
+                        
+                        if (!response.ok) {
+                            throw new Error(`Weather API returned ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        const data = await response.json();
+                        console.log('Weather data received:', data);
+                        
+                        // Simple location name (just use coordinates for now)
+                        let locationName = `${latitude.toFixed(1)}°, ${longitude.toFixed(1)}°`;
+                        
+                        // Update weather display
+                        const temp = Math.round(data.current.temperature_2m);
+                        const weatherCode = data.current.weather_code;
+                        const isDay = data.current.is_day === 1;
+                        const condition = getWeatherDescription(weatherCode);
+                        
+                        document.getElementById('weatherTemp').textContent = `${temp}°C`;
+                        document.getElementById('weatherLocation').textContent = locationName;
+                        document.getElementById('weatherCondition').textContent = condition;
+                        document.getElementById('weatherIcon').textContent = getWeatherIcon(weatherCode, isDay);
+                        
+                        console.log(`Weather updated: ${temp}°C, ${condition}`);
+                        
+                    } catch (error) {
+                        console.error('Error fetching weather for current location:', error);
+                        await fetchWeatherForManchester();
+                    }
+                    
+                }, async (error) => {
+                    console.log('Location access denied or failed:', error.message);
+                    await fetchWeatherForManchester();
+                });
+                
+            } catch (error) {
+                console.error('Weather update failed:', error);
+                await fetchWeatherForManchester();
+            }
+        }
+        
+        async function fetchWeatherForManchester() {
+            try {
+                console.log('Fetching Manchester weather fallback...');
+                // Manchester coordinates: 53.4808, -2.2426
+                const weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=53.4808&longitude=-2.2426&current=temperature_2m,weather_code,is_day&timezone=auto';
+                console.log('Manchester weather URL:', weatherUrl);
+                
+                const response = await fetch(weatherUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Manchester weather API returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Manchester weather data:', data);
+                
+                const temp = Math.round(data.current.temperature_2m);
+                const weatherCode = data.current.weather_code;
+                const isDay = data.current.is_day === 1;
+                const condition = getWeatherDescription(weatherCode);
+                
+                document.getElementById('weatherTemp').textContent = `${temp}°C`;
+                document.getElementById('weatherLocation').textContent = 'Manchester';
+                document.getElementById('weatherCondition').textContent = condition;
+                document.getElementById('weatherIcon').textContent = getWeatherIcon(weatherCode, isDay);
+                
+                console.log(`Manchester weather updated: ${temp}°C, ${condition}`);
+                
+            } catch (error) {
+                console.error('Manchester weather fetch failed:', error);
+                // Final fallback to static data
+                document.getElementById('weatherTemp').textContent = '15°C';
+                document.getElementById('weatherLocation').textContent = 'Manchester';
+                document.getElementById('weatherCondition').textContent = 'Partly cloudy';
+                document.getElementById('weatherIcon').textContent = '⛅';
+                console.log('Using static weather fallback');
+            }
+        }
+
         function calculateMoonPhase() {
             const now = new Date();
             
@@ -542,13 +696,17 @@
         updateDateTime();
         calculateSunTimes();
         calculateMoonPhase();
+        updateWeather();
         setInterval(updateDateTime, 1000);
         
-        // Update sun times and moon phase once per day at midnight
+        // Update sun times, moon phase, and weather periodically
         setInterval(() => {
             calculateSunTimes();
             calculateMoonPhase();
         }, 24 * 60 * 60 * 1000);
+        
+        // Update weather every 10 minutes
+        setInterval(updateWeather, 10 * 60 * 1000);
     </script>
 </body>
 </html>
