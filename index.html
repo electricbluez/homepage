@@ -181,10 +181,57 @@
         }
 
         .search-input:focus {
-            border-color: #3498db;
+            border-color: #20b2aa;
             background: rgba(255, 255, 255, 1);
-            box-shadow: 0 8px 30px rgba(52, 152, 219, 0.2);
+            box-shadow: 0 8px 30px rgba(32, 178, 170, 0.2);
             transform: translateY(-2px);
+        }
+
+        .search-options {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus + .search-options,
+        .search-options:hover {
+            opacity: 1;
+        }
+
+        .search-option {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #2c3e50;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .search-option:hover {
+            background: rgba(32, 178, 170, 0.1);
+            border-color: #20b2aa;
+            transform: translateY(-1px);
+        }
+
+        .search-option.active {
+            background: #20b2aa;
+            color: white;
+            border-color: #20b2aa;
+        }
+
+        .perplexity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-top: 0.5rem;
         }
 
         .quick-info {
@@ -253,6 +300,11 @@
             
             .quick-info {
                 grid-template-columns: 1fr;
+            }
+
+            .search-options {
+                flex-wrap: wrap;
+                gap: 0.5rem;
             }
         }
     </style>
@@ -356,7 +408,16 @@
 
         <div class="search-section">
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search the web..." id="searchInput">
+                <input type="text" class="search-input" placeholder="Ask anything with AI-powered search..." id="searchInput">
+                <div class="search-options">
+                    <span class="search-option active" data-engine="perplexity">🔍 Perplexity</span>
+                    <span class="search-option" data-engine="google">🌐 Google</span>
+                    <span class="search-option" data-engine="duckduckgo">🦆 DuckDuckGo</span>
+                </div>
+                <div class="perplexity-badge">
+                    <span>🤖</span>
+                    <span>AI-powered answers with sources</span>
+                </div>
             </div>
         </div>
 
@@ -400,6 +461,39 @@
     </div>
 
     <script>
+        // Search engine configuration
+        let currentSearchEngine = 'perplexity';
+        
+        const searchEngines = {
+            perplexity: 'https://www.perplexity.ai/search?q=',
+            google: 'https://www.google.com/search?q=',
+            duckduckgo: 'https://duckduckgo.com/?q='
+        };
+
+        // Handle search engine selection
+        document.querySelectorAll('.search-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                document.querySelectorAll('.search-option').forEach(opt => opt.classList.remove('active'));
+                
+                // Add active class to clicked option
+                this.classList.add('active');
+                
+                // Update current search engine
+                currentSearchEngine = this.dataset.engine;
+                
+                // Update placeholder text
+                const input = document.getElementById('searchInput');
+                if (currentSearchEngine === 'perplexity') {
+                    input.placeholder = 'Ask anything with AI-powered search...';
+                } else if (currentSearchEngine === 'google') {
+                    input.placeholder = 'Search Google...';
+                } else {
+                    input.placeholder = 'Search DuckDuckGo...';
+                }
+            });
+        });
+
         // Weather functionality using Open-Meteo (no API key required)
         function getWeatherIcon(weatherCode, isDay = true) {
             // WMO Weather interpretation codes
@@ -690,7 +784,8 @@
             if (e.key === 'Enter') {
                 const query = this.value.trim();
                 if (query) {
-                    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                    const searchUrl = searchEngines[currentSearchEngine] + encodeURIComponent(query);
+                    window.open(searchUrl, '_blank');
                     this.value = '';
                 }
             }
